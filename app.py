@@ -33,6 +33,14 @@ def run_cli(argv: list[str], timeout: int = 45):
     env = os.environ.copy()
     env.setdefault("HOME", "/tmp")
     env.setdefault("XDG_CONFIG_HOME", "/tmp/.config")
+    # Vercel adds function dependency directories to this process's sys.path.
+    # A child Python process does not inherit sys.path automatically, so pass
+    # those paths through PYTHONPATH for the Agent Reach CLI subprocess.
+    inherited_pythonpath = env.get("PYTHONPATH", "")
+    python_paths = [p for p in sys.path if p]
+    env["PYTHONPATH"] = os.pathsep.join(
+        [inherited_pythonpath, *python_paths] if inherited_pythonpath else python_paths
+    )
     try:
         proc = subprocess.run(
             [sys.executable, "-m", "agent_reach.cli", *argv],
