@@ -73,7 +73,7 @@ def read_url():
         return error("Body must contain a valid 'url' string (max 4096 characters).", 400)
     if not url.startswith(("https://", "http://")):
         return error("Only http:// and https:// URLs are accepted.", 400)
-    payload, status = run_cli(["read", url.strip(), "--backend", "public-web"])
+    payload, status = run_cli(["read", url.strip()])
     return jsonify(payload), status
 
 
